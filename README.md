@@ -8,7 +8,7 @@ Sample request:
 ```text
 POST http://localhost:8089/widgets/load
 {
-	"entandoApi": "http://app-entando-pda-test.51.91.30.184.nip.io/entando-de-app",
+	"entandoApi": "<ENTANDO_API_ROOT_URL_HERE>",
 	"authToken": "<OAUTH_TOKEN_HERE>",
 	"widgets": ["task-list", "summary-card", "task-comments", "process-form", "task-completion-form", "task-details"],
 	"serviceUrl": "/pda",
