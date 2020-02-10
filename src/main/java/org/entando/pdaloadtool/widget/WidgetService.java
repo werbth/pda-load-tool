@@ -26,16 +26,16 @@ public class WidgetService {
         loadWidgetRequest.getWidgets().forEach(widget -> loadWidget(restTemplate, widget, loadWidgetRequest));
     }
 
-    private void loadWidget(RestTemplate restTemplate, String widget, LoadWidgetRequest loadWidgetRequest) {
+    private void loadWidget(RestTemplate restTemplate, WidgetRequest widget, LoadWidgetRequest loadWidgetRequest) {
         String widgetTitle = getWidgetTitle(widget);
         WidgetDto widgetDto = WidgetDto.builder()
-                .code(loadWidgetRequest.getBundleId() + "_" + widget.replaceAll("-", "_"))
+                .code(loadWidgetRequest.getBundleId() + "_" + widget.getName().replaceAll("-", "_"))
                 .titles(ImmutableMap.of("en", widgetTitle, "it", widgetTitle))
                 .group("free")
                 .customUi(getCustomUi(widget, loadWidgetRequest))
                 .bundleId(loadWidgetRequest.getBundleId())
                 .configUi(ImmutableMap.of(
-                        "customElement", widget + "-config",
+                        "customElement", widget.getName() + "-config",
                         "resources", loadWidgetRequest.getResources().stream()
                                 .filter(e -> e.endsWith(".js")).collect(Collectors.toList())
                 ))
@@ -51,18 +51,29 @@ public class WidgetService {
         }
     }
 
-    private String getWidgetTitle(String name) {
-        return "PDA - " + Arrays.stream(name.split("-"))
+    private String getWidgetTitle(WidgetRequest widgetRequest) {
+        return "PDA - " + Arrays.stream(widgetRequest.getName().split("-"))
                 .map(StringUtils::capitalize).collect(Collectors.joining(" "));
     }
 
-    private String getCustomUi(String name, LoadWidgetRequest loadWidgetRequest) {
-        return "<#assign wp=JspTaglibs[\"/aps-core\"]>\n"
-                + "<script crossorigin src=\"https://unpkg.com/react@16/umd/react.development.js\"></script>\n"
-                + "<script crossorigin src=\"https://unpkg.com/react-dom@16/umd/react-dom.development.js\"></script>\n"
-                + getResources(loadWidgetRequest.getResources(), loadWidgetRequest.getBundleId())
-                + "<" + name + " service-url=\"" + loadWidgetRequest.getServiceUrl()
-                + "\" page-code=\"${Request.reqCtx.getExtraParam('currentPage').code}\" frame-id=\"${Request.reqCtx.getExtraParam('currentFrame')}\"/>";
+    private String getCustomUi(WidgetRequest widgetRequest, LoadWidgetRequest loadWidgetRequest) {
+        StringBuilder customUi = new StringBuilder();
+        customUi.append("<#assign wp=JspTaglibs[\"/aps-core\"]>\n");
+        if (widgetRequest.isHasTaskId()) {
+            customUi.append("<#if RequestParameters.taskId?exists>\n");
+            customUi.append("    <#assign taskId= RequestParameters.taskId>\n");
+            customUi.append("<#else>   \n");
+            customUi.append("    <#assign taskId= \"\">\n");
+            customUi.append("</#if>\n");
+        }
+        customUi.append("<script crossorigin src=\"https://unpkg.com/react@16/umd/react.development.js\"></script>\n");
+        customUi.append("<script crossorigin src=\"https://unpkg.com/react-dom@16/umd/react-dom.development.js\"></script>\n");
+        customUi.append(getResources(loadWidgetRequest.getResources(), loadWidgetRequest.getBundleId()));
+        customUi.append("<").append(widgetRequest.getName()).append(" service-url=\"")
+                .append(loadWidgetRequest.getServiceUrl());
+        customUi.append("\" page-code=\"${Request.reqCtx.getExtraParam('currentPage').code}\" frame-id=\"${Request.reqCtx.getExtraParam('currentFrame')}\"");
+        customUi.append((widgetRequest.isHasTaskId() ? " id=\"${taskId}\"/>" : "/>"));
+        return customUi.toString();
     }
 
     private String getResources(List<String> resources, String bundleId) {

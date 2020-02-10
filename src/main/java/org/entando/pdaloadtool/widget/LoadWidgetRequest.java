@@ -10,7 +10,7 @@ public class LoadWidgetRequest {
 
     private String entandoApi;
     private String authToken;
-    private List<String> widgets;
+    private List<WidgetRequest> widgets;
     private String serviceUrl;
     private String bundleId;
     private List<String> resources;

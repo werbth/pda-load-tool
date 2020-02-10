@@ -10,8 +10,14 @@ POST http://localhost:8089/widgets/load
 {
 	"entandoApi": "<ENTANDO_API_ROOT_URL_HERE>",
 	"authToken": "<OAUTH_TOKEN_HERE>",
-	"widgets": ["task-list", "summary-card", "task-comments", "process-form", "task-completion-form", "task-details"],
-	"serviceUrl": "/pda",
+	"widgets": [
+    		{"name": "task-list", "hasTaskId": false}, 
+    		{"name": "summary-card", "hasTaskId": false}, 
+    		{"name": "task-comments", "hasTaskId": true}, 
+    		{"name": "process-form", "hasTaskId": false}, 
+    		{"name": "task-completion-form", "hasTaskId": true}, 
+    		{"name": "task-details", "hasTaskId": true}],
+    	"serviceUrl": "/pda",
 	"bundleId": "pda",
 	"resources": [
 		"static/css/2.8c216021.chunk.css",
