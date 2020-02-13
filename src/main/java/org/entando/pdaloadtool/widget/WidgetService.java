@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
@@ -15,15 +16,18 @@ import org.springframework.web.client.HttpClientErrorException.NotFound;
 import org.springframework.web.client.RestTemplate;
 
 @Service
+@Slf4j
 public class WidgetService {
 
     public void loadWidgets(LoadWidgetRequest loadWidgetRequest) {
+        log.info("Start loading widgets for bundleId: {}", loadWidgetRequest.getBundleId());
         RestTemplate restTemplate = new RestTemplateBuilder()
                 .rootUri(loadWidgetRequest.getEntandoApi())
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + loadWidgetRequest.getAuthToken())
                 .build();
 
         loadWidgetRequest.getWidgets().forEach(widget -> loadWidget(restTemplate, widget, loadWidgetRequest));
+        log.info("Finish loading widgets for bundleId: {}", loadWidgetRequest.getBundleId());
     }
 
     private void loadWidget(RestTemplate restTemplate, WidgetRequest widget, LoadWidgetRequest loadWidgetRequest) {
