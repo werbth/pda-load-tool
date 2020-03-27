@@ -41,7 +41,9 @@ public class WidgetService {
                 .configUi(ImmutableMap.of(
                         "customElement", widget.getName() + "-config",
                         "resources", loadWidgetRequest.getResources().stream()
-                                .filter(e -> e.endsWith(".js")).collect(Collectors.toList())
+                                .filter(e -> e.endsWith(".js"))
+                                .map(e -> loadWidgetRequest.getBundleId() + "/" + e)
+                                .collect(Collectors.toList())
                 ))
                 .build();
 
