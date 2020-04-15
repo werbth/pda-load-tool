@@ -72,13 +72,26 @@ public class WidgetService {
             customUi.append("    <#assign taskId= \"\">\n");
             customUi.append("</#if>\n");
         }
+        if ("task-details".equals(widgetRequest.getName())) {
+            customUi.append("<#if RequestParameters.taskPos?exists>\n");
+            customUi.append("   <#assign taskPos= RequestParameters.taskPos>\n");
+            customUi.append("<#else>   \n");
+            customUi.append("   <#assign taskPos= \"\">\n");
+            customUi.append("</#if>\n");
+        }
         customUi.append("<script crossorigin src=\"https://unpkg.com/react@16/umd/react.development.js\"></script>\n");
         customUi.append("<script crossorigin src=\"https://unpkg.com/react-dom@16/umd/react-dom.development.js\"></script>\n");
         customUi.append(getResources(loadWidgetRequest.getResources(), loadWidgetRequest.getBundleId()));
         customUi.append("<").append(widgetRequest.getName()).append(" service-url=\"")
                 .append(loadWidgetRequest.getServiceUrl());
         customUi.append("\" page-code=\"${Request.reqCtx.getExtraParam('currentPage').code}\" frame-id=\"${Request.reqCtx.getExtraParam('currentFrame')}\"");
-        customUi.append((widgetRequest.isHasTaskId() ? " id=\"${taskId}\"/>" : "/>"));
+        if (widgetRequest.isHasTaskId()) {
+            customUi.append((" id=\"${taskId}\"" ));
+        }
+        if ("task-details".equals(widgetRequest.getName())) {
+            customUi.append((" task-pos=\"${taskPos}\"" ));
+        }
+        customUi.append("/>");
         return customUi.toString();
     }
 
